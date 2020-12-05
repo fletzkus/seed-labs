@@ -36,7 +36,7 @@ header {
     font-family: 'Raleway', sans-serif;
   }
   .Intro {
-    background-color: rgb(204, 160, 185);
+    background-color: rgb(204, 160, 171);
     height: 100vh;
   }
   .Intro-container {
@@ -98,7 +98,7 @@ header {
     color: rgb(187, 187, 187);
   }
   .footer-contents {
-    height: 100px;
+    height: 70px;
     width: 100%;
     font-size: 18px;
     display: flex;
