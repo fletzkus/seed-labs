@@ -6,13 +6,31 @@ app = Flask(__name__)
 def hello():
     return "Hello, yeet!"
 
-@app.route("/home")
-def home():
+# @app.route("/malicious")
+# def malicious():
+#     resp = Response()
+#     resp.data = render_template('malicious.html')
+#     # resp = Flask.make_response(render_template('index.html', title="Welcome", username="Stanley"))
+#     return resp
+
+# @app.route("/safe_malicious")
+# def safe_malicious():
+#     resp = Response()
+#     resp.data = render_template('malicious.html')
+#     # resp = Flask.make_response(render_template('index.html', title="Welcome", username="Stanley"))
+#     resp.headers['X-Frame-Options'] = 'DENY'
+#     resp.headers['Content-Security-Policy'] = "frame-ancestors 'none'"
+#     return resp
+
+@app.route("/not_malicious")
+def not_malicious():
     resp = Response()
-    resp.data = render_template('index.html')
-    # resp = Flask.make_response(render_template('index.html', title="Welcome", username="Stanley"))
-    resp.headers['X-Frame-Options'] = 'DENY'
-    resp.headers['Content-Security-Policy'] = "frame-ancestors 'none'"
+    resp.data = render_template('not_malicious.html')
+
+    # Add in for safety
+    # resp.headers['X-Frame-Options'] = 'DENY'
+    # resp.headers['Content-Security-Policy'] = "frame-ancestors 'none'"
+
     return resp
 
 @app.route("/clicked_button")
