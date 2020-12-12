@@ -1,12 +1,8 @@
 
 
 iframe {
-    /* TODO: add iframe css here */
+    /* TODO: add iframe css here (Task 1) */
     
-    /* solution */
-    /* height:100%;
-    width:100%;
-    position:absolute; */
 }
 
 button{
@@ -21,15 +17,10 @@ button{
     /* end of given button code */
 
 
-    /* TODO: edit/add attributes below for the malicious button */
+    /* TODO: edit/add attributes below for the malicious button (Task 2) */
     /* You will want to change the button's position on the page and make the button transparent */
 
     color: white; /* font color */
     background-color: blue; /* button's background color */
 
-    /* solution */
-    /* margin-left: 50px;
-    margin-top: 350px;
-    color: hsla(0, 0%, 0%, 0);
-    background-color: hsla(0, 0%, 0%, 0); */
   }
