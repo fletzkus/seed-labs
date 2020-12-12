@@ -1,0 +1,293 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  Copyright by <Author's Name(s)>                                 %%
+%%  This work is licensed under the Creative Commons                %%
+%%  Attribution-NonCommercial-ShareAlike 4.0 International License. %%
+%%  To view a copy of this license, visit                           %%
+%%  http://creativecommons.org/licenses/by-nc-sa/4.0/.              %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\input{../common-files/header}
+
+\lhead{\bfseries SEED Labs -- Clickjacking Lab}
+
+\begin{document}
+
+\begin{center}
+{\LARGE Clickjacking Lab}
+\end{center}
+
+
+% *******************************************
+% Overview
+% ******************************************* 
+\section{Overview}
+
+\paragraph{} Clickjacking, or ``UI redress attack", is an attack that tricks a user into clicking something they did not intend to click. In this lab, we will explore a common way clickjacking is performed where 
+ the attacker creates an imitation website that places the real website in an iframe, and then places invisible button(s) on top of the button(s) or link(s) displayed by the real website. 
+
+\paragraph{Example Scenario}
+Imagine an attacker creates ``starbux.com" and places ``starbucks.com" in an iframe on their website. The websites look identical, misleading a user on the malicious site to believe nothing is wrong. However, on top of a legitimate button on the real site, an attacker could place an invisible button that makes the user buy a product on Amazon. Given the user is signed into Amazon in that browser and they have 1-click purchase enabled, the attacker just made an actual sale on their product.
+
+\paragraph{Learn More}
+There are a number of other ways to perform clickjacking and many malicious consequences to the user. If you would like to learn more about clickjacking, visit \href{https://owasp.org/www-community/attacks/Clickjacking}{https://owasp.org/www-community/attacks/Clickjacking}.
+
+
+
+
+% *******************************************
+% Environment Setup
+% ******************************************* 
+\section{Environment Setup}
+
+%%%%% Installations %%%%%%
+
+\subsection{Installations}
+Make sure you have the following installed:
+
+\begin{enumerate}
+    \item Python 3
+    \begin{itemize}
+        \item You can use \texttt{python3 --version} to see check if it is installed
+        \item If it is not installed, use your preferred method of installation. Here is the downloads page on the official Python website: \href{https://www.python.org/downloads/release/python-391/}{https://www.python.org/downloads/release/python-391/}
+    \end{itemize}
+
+    \item Flask: Run the following command: \texttt{pip install -U Flask}
+    \begin{itemize}
+        \item For more information: \href{https://pypi.org/project/Flask/}{https://pypi.org/project/Flask/}
+    \end{itemize}
+    
+    % FIXME waiting for response on Piazza to know how to link zip download
+    \item Download and unzip Web\_Clickjacking.zip on the seed lab website.
+\end{enumerate}
+
+
+%%%%% How to Run a Flask Server %%%%%
+
+\subsection{Run the Flask Server}
+To run the server, navigate to the directory called \textit{not\_malicious\_server} in the given code files. Note that this directory contains \texttt{server.py}. Now, run:
+\begin{itemize}
+    \item[\$] \texttt{export FLASK\_APP=server.py}
+    \item[\$] \texttt{flask run}
+\end{itemize}
+
+\paragraph{Important Note} Any time you make an update to the server, you will need to restart it. To do so, use the  key combination Ctrl+C to stop it, and type \texttt{flask run} to restart it. If you exit out of your VM, you may need to run the export command again (\texttt{\$ export FLASKAPP=server.py}) before running the server.
+
+\paragraph{Test} Navigate to the page: \href{http://localhost:5000/not\_malicious}{http://localhost:5000/not\_malicious}. You should see a page for Alice's Cupcakes, a local bakery. If the whole site does not fit in your window size, use Ctrl + (minus key) and Ctrl + (plus key) to zoom out and in respectively. 
+
+\subsection{Open Malicious HTML File}
+
+Open malicious.html in a separate tab. For example, in Firefox, use this format in the address bar:
+\\\texttt{file:///path/to/file}
+
+
+
+
+% *******************************************
+% Lab Tasks
+% *******************************************
+\section{Lab Tasks} 
+
+%%%%%%%%%% Task 1 %%%%%%%%%% 
+
+\subsection{Task 1: Copy that site!}
+
+Explore the file structure. In the \textit{server} folder, you will find all of the files you will need for the "not malicious" website: \texttt{not\_malicious.html}, \texttt{server.py}. This site will be run on your server locally using flask. In the \textit{malicious} folder, you will find all of the files you will need for the malicious site: \texttt{malicious.html}, \texttt{malicious.css}. This site will be run locally. You will be making changes to all of these files throughout the tasks. 
+
+Our first step is to add code to \texttt{malicious.html} so that it looks exactly the same as 
+
+\noindent\texttt{not\_malicious.html}. A clever way to do this is with an HTML Inline Frame element (iframe). An iframe embeds another HTML page into the one where the iframe is. The iframe uses the \texttt{src} attribute to reference the site it's embedding. Iframes act as a nested frame of the new site into the current site. 
+
+\paragraph{Embed the not malicious site into the malicious site:}
+\begin{itemize}
+    \item Run the \texttt{not\_malicious.html} locally using the flask server (see Environment setup 2.2)
+    \item Setup an iframe HTML element in \texttt{malicious.html} that pulls from
+    
+    \texttt{http://localhost:5000/not\_malicious}. 
+    
+    \item Modify the CSS in \texttt{malicious.css} using the height, width, and position attributes to make the iframe cover the whole page.
+    
+    \item Test your changes by opening malicious.html (see Environment setup 2.3).
+\end{itemize} 
+
+% \textbf{Solution for Instructors:}
+% <!-- iframe in malicious.html -->
+% <iframe src="http://localhost:5000/not_malicious" frameborder="0" ></iframe>
+
+% /* iframe css in malicious.css */
+% iframe {
+%     height:100%;
+%     width:100%;
+%     position:absolute;
+% }
+
+\paragraph{Questions:}
+\begin{enumerate}
+    \item With the server running, what does \texttt{malicious.html} look like?
+        % Solution for Instructors:
+        % It looks exactly like not\_malicious.html. Clicking on the ``Explore Menu" button takes you to the not\_malicious.html page as it normally functions.
+\end{enumerate}
+
+%%%%%%%%%% Task 2 %%%%%%%%%% 
+
+\subsection{Task 2: Let’s Get ClickJacking!}
+
+\paragraph{Setup and Perform the Clickjacking Attack}
+Write CSS in \texttt{malicious.css} to make the malicious button in \texttt{malicious.html} invisible. Position the button such that it covers the ``Explore Menu" button within the iframe from the last task. There are a variety of solutions that work. However, we recommend looking into these CSS attributes: \texttt{margin-left}, \texttt{margin-top}, \texttt{color}, and \texttt{background-color}. By completing this task, you should have a functioning clickjacking attack. 
+
+% \textbf{Solution for Instructors:}
+% /* malicious button css in malicious.css */
+% button{
+%     /* Given button code for size and shape. You do not need to edit this. */
+%     position: absolute;
+%     border: none;
+%     color: white;
+%     padding: 35px 35px;
+%     text-align: center;
+%     font-size: 40px;
+%     border-radius: 15px;
+%     /* end of given button code */
+
+
+%     /* TODO: edit/add attributes below for the malicious button */
+%     /* You will want to change the button's position on the page and make the button transparent */
+
+%     /* solution */
+%     margin-left: 50px;
+%     margin-top: 350px;
+%     color: hsla(0, 0%, 0%, 0);
+%     background-color: hsla(0, 0%, 0%, 0);
+%   }
+
+
+\paragraph{Questions:}
+\begin{enumerate}
+    \item How does the malicious site’s appearance compare to the non-malicious site?
+        % Solution for Instructors:
+        % The malicious site looks identical to the non-malicious site. This is because the malicious site is displaying the non-malicious site in a frame for its whole page.
+    \item What happens when you try to click on the ``Explore Menu” button?
+        % Solution for Instructors:
+        % It takes the victim to you\_have\_been\_hacked.html. The user should be mislead to believe they are clicking on an innocent ``Explore Menu" button, when in reality they are really clicking on the invisible malicious button.
+    \item Think of and describe a scenario where this clickjacking could occur and lead to bad consequences.
+        % Solution for Instructors:
+        % There are many scenarios that work here. A clickjacking could occur on any website such as a restaurant (like this lab), online store, or local business' informative website. And instead of taking you to a harmless page with some silly text, it could download a virus to your computer. Alternatively, if it were an online store where purchases can be made, there could be multiple invisible items like text fields and a button. This way, when you enter your credit card information to pay, you hand over all of this information to the attacker. These are just a few cases that work, but it is up to the instructor if the scenario and consequences make sense.
+\end{enumerate}
+
+
+%%%%%%%%%% Task 3 %%%%%%%%%% 
+
+\subsection{Task 3: Bust That Frame!}
+Frame busting is the practice of writing scripts to prevent a web page from being displayed within a frame. From your site, you can write scripts to restrict the ability of your site to be framed - that is, for someone else to use your site in an iframe. The technique we will implement today checks that your site is the topmost site on any page. 
+
+
+\paragraph{Write the Frame Busting Script} 
+
+Navigate to \texttt{not\_malicious.html}. Here, you will fill in the method called $makeThisFrameOnTop()$. Your method should compare \texttt{window.top} and \texttt{window.self} to find out if the top window and your site are the same (as they should be). If not, use the \href{https://developer.mozilla.org/en-US/docs/Web/API/Location}{Location Object} to set the location of self to be the same as the location of top. This should be a simple script and take no more than a few lines of code. Test it out and confirm that your script successfully stops the clickjacker. 
+
+\paragraph{Reminder} Remember that any time you make changes to a file on the server, you must restart the server (see ``Important Note" in Setup). 
+
+
+% \textbf{Solution for Instructors:} 
+
+% // One possible solution: 
+% function makeThisFrameOnTop() {
+%   if(window.top != window.self) {
+%       window.top.location = window.self.location
+%   }
+% }
+
+% // Another possible solution: 
+% function makeThisFrameOnTop() {
+%   if(top != self) {
+%       top.location = self.location
+%   }
+% }
+
+\paragraph{Questions:}
+\begin{enumerate}
+    \item What happened when you tried navigating to the malicious site?
+        % Solution for Instructors:
+        % If the frame busting script is working, when you navigate to the malicious site, it should now automatically redirect you to not\_malicious.html. This is because in not\_malicious.html, you checked to see if not\_malicious.html was embedded in some site (not the topmost frame), and if so, you broke out of that embedded frame. 
+    \item What happened when you tried clicking the button?
+        % Solution for Instructors:
+        % It navigates to (so technically stays on) not\_malicious.html since we were redirected and are only interacting with not\_malicious.html.
+\end{enumerate}
+
+
+
+%%%%%%%%%% Task 4 %%%%%%%%%% 
+
+\subsection{Task 4: Bustception (Bust the Buster)}
+
+\paragraph{Disable the frame busting script}
+Now, let's explore how simple it is for the attacker to create a workaround for front-end clickjacking defenses like frame busting. There are multiple ways of accomplishing this, such as a double frame attack, but one of the simplest in this situation is the following: add in the sandbox attribute to the malicious iframe. Read more about the sandbox attribute on  \underline{\href{https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe}{this page}} about iframe's.
+
+% \textbf{Solution for Instructors:} 
+% <!-- Updated iframe with sandbox attribute in malicious.html -->
+% \begin{algorithmic}
+%     \State <iframe sandbox src="http://localhost:5000/not_malicious" frameborder="0"></iframe>
+% \end{algorithmic}
+
+
+\paragraph{Questions:}
+\begin{enumerate}
+    \item What does the sandbox attribute do? Why does this prevent the frame buster from working?
+        % Solution for Instructors:
+        % The sandbox attribute, by default, applies a number of restrictions to the frame, including preventing the embedded site from running scripts. Setting the sandbox to different properties allows you to begin to enable different properties for the embedded frame. 
+    \item What happened when you tried navigating to the malicious site after updating the iframe to use sandbox?
+        % Solution for Instructors:
+        % When the students try to navigate to the malicious site now, it should stay on the malicious page instead of immediately navigating away as the frame busting script previously made it do. 
+    \item What happened when you tried clicking the button?
+        % Solution for Instructors:
+        % Clicking the button should again take you to you\_have\_been\_hacked.html.
+\end{enumerate}
+
+
+%%%%%%%%%% Task 5 %%%%%%%%%% 
+
+\subsection{Task 5: The Ultimate Bust}
+As we saw in Task 4, front-end focused defenses are not enough. To really prevent the clickjacking attack, we need to setup some solid security on the back-end. By adding a server-side defense, we can prevent a malicious website from being able to get our website's content before it even has a chance to do any front-end workarounds. This is because you will be modifying the HTTP header (or presumably HTTPS in the case of a real website) as opposed to checking certain attributes only after the content has been processed by the malicious website. Add in server-side code to modify the HTTP header of the server's response, and test it by navigating to the malicious site.
+
+\paragraph{Modify the Response Header} Navigate to \texttt{server.py}. Add code to $not\_malicious()$ to modify the HTTP header in order to prevent the clickjacking attack.
+
+\paragraph{Hint} In Flask (and many other common frameworks) it is super simple to modify a response's header. If \texttt{resp} is a response object to be returned by a function, you can easily modify its header with:
+\\\texttt{resp.headers[`attribute'] = value} where \texttt{attribute} 
+is the desired attribute you would like to modify. In our case, the X-Frame-Options attribute (learn more \underline{\href{https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options}{here}}) should be set to \texttt{"DENY"} and the Content-Security-Policy (learn more \underline{\href{https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP}{here}}) should be set to \texttt{"frame-ancestors `none'"}.
+
+
+\paragraph{Reminder} Remember that any time you make an update to the server, you will need to restart it (see ``Important Note" in Setup).
+
+
+% \textbf{Solution for Instructors:} 
+% resp.headers['X-Frame-Options'] = 'DENY'
+% resp.headers['Content-Security-Policy'] = "frame-ancestors 'none'"
+
+
+\paragraph{Questions:}
+\begin{enumerate}
+    \item What is the X-Frame-Options HTTP header attribute?
+        % Solution for Instructors:
+        % The X-Frame-Options HTTP response header can be used to indicate whether or not a browser should be allowed to render a page in a <frame> , <iframe> , <embed> or <object>. See more here: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
+    \item What is the Content-Security-Policy header attribute?
+        % Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross-Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement to distribution of malware. See more here: https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
+    \item What happened when you tried navigating to the malicious site? What do you see?
+        % Solution for Instructors:
+        % The malicious site should not even display the non-malicious site's material. This is because the response header from the server ensures that it cannot be displayed within a frame. The attacker did not have the opportunity to work around the file's code because it was blocked by the HTTP layer. This now places importance on encrypting and securing the HTTP layer (HTTPS) which is outside the scope of the lab though still important to recognize.
+\end{enumerate}
+
+
+
+
+
+
+
+% *******************************************
+% Submission
+% ******************************************* 
+\section{Submission}
+
+\begin{quote}
+\seedsubmission
+\end{quote}
+
+
+\end{document}
